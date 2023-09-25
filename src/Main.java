@@ -9,56 +9,69 @@ import java.util.stream.Collectors;
 public class Main {
     public static void main(String[] args) throws Exception {
         try(BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
-
             String line = br.readLine().trim().replaceAll(" ", "");
-
-            if(isRoman(line)) {
-                String[] arabic = line.replaceAll("[+*/()-]+"," ").split(" ");
-                String[] operator = line.replaceAll("[A-z()]+","").split("");
-
-                if(line.equals(arabic[0])) {
-                    throw new Exception("Строка не является математической операцией");
-                }
-
-                if(arabic.length > 2 && operator.length > 1) {
-                    throw new Exception("Формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-                }
-
-                if(!isRoman(arabic[0]) || !isRoman(arabic[1])) {
-                    throw new Exception("Используются одновременно разные системы счисления");
-                }
-
-                int result = Calculator(romanToArabic(arabic[0]), romanToArabic(arabic[1]), operator[0]);
-
-                if(result <= 0) {
-                    throw new Exception("В римской системе нет отрицательных чисел"); //т.к. в римской системе нет отрицательных чисел
-                }
-
-                System.out.println(arabicToRoman(result));
-            } else {
-                String[] operator = line.replaceAll("[0-9()]+","").split("");
-                String[] arg = line.replaceAll("[+*/()-]+"," ").split(" ");
-
-                if(line.equals(arg[0])) {
-                    throw new Exception("Строка не является математической операцией");
-                }
-
-                if(arg.length > 2 && operator.length > 1) {
-                    throw new Exception("Формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
-                }
-
-                if(line.matches("^[a-zA-Z]*$")) {
-                    throw new Exception("Используются одновременно разные системы счисления");
-                }
-
-                System.out.println(Calculator(Integer.parseInt(arg[0]), Integer.parseInt(arg[1]), operator[0]));
-            }
-
+            System.out.println(calc(line));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public static String calc(String input) throws Exception {
+
+        if(input.length() < 3) {
+            throw new Exception("Ошибка ввода, в строке нет арифметической операции");
+        }
+
+        String result;
+        String[] operator;
+        int x, y;
+        String[] arg = input.replaceAll("[+*/()-]+"," ").split(" ");
+        boolean RomanOut = false;
+
+        if(isRoman(arg[0]) == isRoman(arg[1])) {
+
+            if(input.equals(arg[0])) {
+                throw new Exception("Строка не является математической операцией");
+            }
+            if(isRoman(arg[0])) {
+                operator = input.replaceAll("[A-z()]+","").split("");
+                x = romanToArabic(arg[0]);
+                y = romanToArabic(arg[1]);
+                RomanOut = true;
+            } else {
+                operator = input.replaceAll("[0-9()]+","").split("");
+                x = Integer.parseInt(arg[0]);
+                y = Integer.parseInt(arg[1]);
+            }
+            
+            if(arg.length > 2 || operator.length > 1) {
+                throw new Exception("Формат математической операции не удовлетворяет заданию - два операнда и один оператор (+, -, /, *)");
+            }
+
+            if(operator[0].equals("-") && x < y) {
+                throw new Exception("В римской системе нет отрицательных чисел"); //т.к. в римской системе нет отрицательных чисел
+            }
+
+        } else {
+            throw new Exception("Используются одновременно разные системы счисления");
+        }
+
+        if(x < 1 || x > 10 || y < 1 || y > 10) {
+            throw new Exception("На вход принимаются только числа от 1 до 10, включительно.");
+        }
+        result = switch (operator[0]) {
+            case "+" -> String.valueOf(x + y);
+            case "-" -> String.valueOf(x - y);
+            case "*" -> String.valueOf(x * y);
+            case "/" -> String.valueOf(x / y);
+            default -> throw new Exception("Ошибка выбора знака операции");
+        };
+        if(!RomanOut) {
+            return result;
+        } else {
+            return arabicToRoman(Integer.parseInt(result));
+        }
+    }
     public static boolean isRoman(String str) {
         return str.contains("I") || str.contains("V") || str.contains("X") ||
                 str.contains("L") || str.contains("C");
@@ -121,22 +134,6 @@ public class Main {
                 i++;
             }
         }
-
         return result;
-    }
-
-    public static int Calculator(int arg1, int arg2, String operator) throws Exception {
-
-        if(arg1 < 1 || arg1 > 10 || arg2 < 1 || arg2 > 10) {
-            throw new Exception("На вход принимаются только числа от 1 до 10, включительно.");
-        }
-
-        return switch (operator) {
-            case "+" -> arg1 + arg2;
-            case "-" -> arg1 - arg2;
-            case "*" -> arg1 * arg2;
-            case "/" -> arg1 / arg2;
-            default -> 0;
-        };
     }
 }
