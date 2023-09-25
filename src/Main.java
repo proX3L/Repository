@@ -19,7 +19,7 @@ public class Main {
     public static String calc(String input) throws Exception {
 
         if(input.length() < 3) {
-            throw new Exception("Ошибка ввода, в строке нет арифметической операции");
+            throw new Exception("Строка не является математической операцией");
         }
 
         String result;
@@ -30,9 +30,6 @@ public class Main {
 
         if(isRoman(arg[0]) == isRoman(arg[1])) {
 
-            if(input.equals(arg[0])) {
-                throw new Exception("Строка не является математической операцией");
-            }
             if(isRoman(arg[0])) {
                 operator = input.replaceAll("[A-z()]+","").split("");
                 x = romanToArabic(arg[0]);
