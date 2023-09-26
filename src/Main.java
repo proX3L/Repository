@@ -25,7 +25,7 @@ public class Main {
         String result;
         String[] operator;
         int x, y;
-        String[] arg = input.replaceAll("[+*/()-]+"," ").split(" ");
+        String[] arg = input.replaceAll("[+*/-]+"," ").split(" ");
         boolean RomanOut = false;
 
         if(isRoman(arg[0]) == isRoman(arg[1])) {
